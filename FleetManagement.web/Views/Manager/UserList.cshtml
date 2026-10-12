@@ -1,0 +1,47 @@
+@model List<FleetManagement.Web.Models.UserResponse>
+@{
+    ViewData["Title"] = "All Users";
+}
+
+<div style="font-family: sans-serif; padding: 30px; max-width: 900px; margin: 0 auto;">
+    <h1>All Users</h1>
+    <p>
+       <a href="/Manager/Dashboard">← Dashboard</a> |
+        <a href="/Admin/CreateUser">➕ Create User</a>
+    </p>
+
+    @if (TempData["Error"] != null)
+{
+    <div style="background:#fee2e2; color:#991b1b; padding:10px; border-radius:4px; margin:15px 0;">
+        @TempData["Error"]
+    </div>
+}
+
+    <table style="width:100%; border-collapse: collapse; margin-top: 20px;">
+        <thead>
+            <tr style="background:#f3f4f6; text-align:left;">
+                <th style="padding:8px; border-bottom:1px solid #ddd;">Name</th>
+                <th style="padding:8px; border-bottom:1px solid #ddd;">Email</th>
+                <th style="padding:8px; border-bottom:1px solid #ddd;">Phone</th>
+                <th style="padding:8px; border-bottom:1px solid #ddd;">Roles</th>
+                <th style="padding:8px; border-bottom:1px solid #ddd;">Active</th>
+                <th style="padding:8px; border-bottom:1px solid #ddd;">Last Login</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">@u.Name</td>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">@u.Email</td>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">@u.Phone</td>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">@string.Join(", ", u.Roles)</td>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">@(u.IsActive ? "Yes" : "No")</td>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">
+                        @(u.LastLoginAt?.ToString("yyyy-MM-dd HH:mm") ?? "—")
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

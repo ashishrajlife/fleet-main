@@ -1,0 +1,63 @@
+@model FleetManagement.Web.Models.CreateUserRequest
+@{
+    ViewData["Title"] = "Create User";
+}
+
+<div style="font-family: sans-serif; padding: 30px; max-width: 500px; margin: 0 auto;">
+    <h1>Create New User</h1>
+    <p><a href="/Admin/Dashboard">← Back to Dashboard</a></p>
+
+    <form asp-action="CreateUser" method="post" style="margin-top: 20px;">
+        @Html.AntiForgeryToken()
+
+        <div style="margin-bottom: 15px;">
+            <label style="display:block; margin-bottom:4px;">Full Name</label>
+            <input asp-for="Name" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;" />
+            <span asp-validation-for="Name" style="color:red; font-size:12px;"></span>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="display:block; margin-bottom:4px;">Email</label>
+            <input asp-for="Email" type="email" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;" />
+            <span asp-validation-for="Email" style="color:red; font-size:12px;"></span>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="display:block; margin-bottom:4px;">Phone</label>
+            <input asp-for="Phone" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;" />
+            <span asp-validation-for="Phone" style="color:red; font-size:12px;"></span>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="display:block; margin-bottom:4px;">Password (min 8 chars, at least 1 upper, 1 digit)</label>
+            <input asp-for="Password" type="password" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;" />
+            <span asp-validation-for="Password" style="color:red; font-size:12px;"></span>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="display:block; margin-bottom:4px;">Role</label>
+            <select asp-for="Role" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                <option value="driver">Driver</option>
+                <option value="manager">Manager</option>
+                <option value="viewer">Viewer</option>
+                <option value="admin">Admin</option>
+            </select>
+            <span asp-validation-for="Role" style="color:red; font-size:12px;"></span>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div style="color:red; margin-bottom: 15px;">
+                @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div>@err.ErrorMessage</div>
+                }
+            </div>
+        }
+
+        <button type="submit"
+                style="padding: 10px 20px; background:#2563eb; color:white; border:none; border-radius:4px; cursor:pointer;">
+            Create User
+        </button>
+    </form>
+</div>

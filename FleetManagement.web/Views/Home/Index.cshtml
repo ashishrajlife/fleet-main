@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<div style="font-family: sans-serif; padding: 40px; text-align: center;">
+    <h1>@ViewBag.Message</h1>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <p style="color: #555;">
+            Logged in as: <strong>@User.Identity.Name</strong>
+        </p>
+        <p style="color: #555;">
+            Roles:
+            @string.Join(", ", ((System.Security.Claims.ClaimsIdentity)User.Identity)
+                .Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role)
+                .Select(c => c.Value))
+        </p>
+
+        <form asp-controller="Account" asp-action="Logout" method="post" style="margin-top: 20px;">
+            @Html.AntiForgeryToken()
+            <button type="submit" style="padding: 10px 20px; cursor: pointer;">Logout</button>
+        </form>
+
+        <div style="margin-top: 30px;">
+            <a href="/api/auth/me" target="_blank">View my API profile</a> |
+            @if (User.IsInRole("admin"))
+            {
+                <a href="/api/auth/admin/panel" target="_blank">Admin API</a>
+            }
+            @if (User.IsInRole("driver"))
+            {
+                <a href="/api/auth/driver/panel" target="_blank">Driver API</a>
+            }
+            @if (User.IsInRole("admin"))
+            {
+                <div style="margin-top: 20px;">
+                    <a href="/Admin/Dashboard"
+                    style="padding: 12px 20px; background:#2563eb; color:white; text-decoration:none; border-radius:6px;">
+                        🛠️ Admin Dashboard
+                    </a>
+                </div>
+            }
+            @if (User.IsInRole("manager"))
+            {
+                <div style="margin-top: 20px;">
+                    <a href="/Manager/Dashboard"
+                    style="padding: 12px 20px; background:#16a34a; color:white; text-decoration:none; border-radius:6px;">
+                        🛠️ Manager Dashboard
+                    </a>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p><a href="/Account/Login">Login here</a></p>
+    }
+</div>

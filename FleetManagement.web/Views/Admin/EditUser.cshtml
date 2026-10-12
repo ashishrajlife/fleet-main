@@ -1,0 +1,62 @@
+@model FleetManagement.Web.Models.UpdateUserRequest
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<div style="font-family: sans-serif; padding: 30px; max-width: 500px; margin: 0 auto;">
+    <h1>Edit User</h1>
+    <p><a href="/Admin/UserList">← Back to list</a></p>
+
+    <form asp-action="EditUser" method="post" style="margin-top: 20px;">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+
+        <div style="margin-bottom: 15px;">
+            <label>Full Name</label>
+            <input asp-for="Name" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;" />
+            <span asp-validation-for="Name" style="color:red; font-size:12px;"></span>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label>Email</label>
+            <input asp-for="Email" type="email" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;" />
+            <span asp-validation-for="Email" style="color:red; font-size:12px;"></span>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label>Phone</label>
+            <input asp-for="Phone" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;" />
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label>Role</label>
+            <select asp-for="Role" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                <option value="driver">Driver</option>
+                <option value="manager">Manager</option>
+                <option value="viewer">Viewer</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label>
+                <input asp-for="IsActive" type="checkbox" /> Active
+            </label>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div style="color:red; margin-bottom: 15px;">
+                @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div>@err.ErrorMessage</div>
+                }
+            </div>
+        }
+
+        <button type="submit"
+                style="padding: 10px 20px; background:#2563eb; color:white; border:none; border-radius:4px; cursor:pointer;">
+            Save Changes
+        </button>
+    </form>
+</div>
