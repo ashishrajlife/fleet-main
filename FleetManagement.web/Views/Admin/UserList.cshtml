@@ -4,99 +4,124 @@
     var currentEmail = User.Identity?.Name ?? "";
 }
 
-<div style="font-family: sans-serif; padding: 30px; max-width: 1200px; margin: 0 auto;">
-    <h1>All Users</h1>
-    <p>
-        <a href="/Admin/Dashboard">← Dashboard</a> |
-        <a href="/Admin/CreateUser">➕ Create User</a>
-    </p>
+<a href="/Admin/Dashboard" class="back-link">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    Dashboard
+</a>
 
-    @if (TempData["Success"] != null)
-    {
-        <div style="background:#dcfce7; color:#166534; padding:10px; border-radius:4px; margin:15px 0;">
-            @TempData["Success"]
-        </div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div style="background:#fee2e2; color:#991b1b; padding:10px; border-radius:4px; margin:15px 0;">
-            @TempData["Error"]
-        </div>
-    }
+<div class="page-head">
+    <h1 class="page-head__title">All Users</h1>
+    <a href="/Admin/CreateUser" class="btn-signal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        Create User
+    </a>
+</div>
 
-    <table style="width:100%; border-collapse: collapse; margin-top: 20px; font-size:14px;">
+@if (TempData["Success"] != null)
+{
+    <div class="alert-box alert-box--ok" role="status">
+        @TempData["Success"]
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert-box alert-box--err" role="alert">
+        @TempData["Error"]
+    </div>
+}
+
+<div class="table-card">
+    <table class="data-table">
         <thead>
-            <tr style="background:#f3f4f6; text-align:left;">
-                <th style="padding:8px; border-bottom:1px solid #ddd;">Name</th>
-                <th style="padding:8px; border-bottom:1px solid #ddd;">Email</th>
-                <th style="padding:8px; border-bottom:1px solid #ddd;">Phone</th>
-                <th style="padding:8px; border-bottom:1px solid #ddd;">Roles</th>
-                <th style="padding:8px; border-bottom:1px solid #ddd;">Status</th>
-                <th style="padding:8px; border-bottom:1px solid #ddd;">Last Login</th>
-                <th style="padding:8px; border-bottom:1px solid #ddd;">Actions</th>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Roles</th>
+                <th>Status</th>
+                <th>Last Login</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var u in Model)
             {
                 var isSelf = u.Email == currentEmail;
-                <tr style="@(u.IsActive ? "" : "opacity:0.55;")">
-                    <td style="padding:8px; border-bottom:1px solid #eee;">
-                        @u.Name @(isSelf ? " (you)" : "")
+                var initial = string.IsNullOrEmpty(u.Name) ? "?" : u.Name.Substring(0, 1).ToUpper();
+                <tr class="@(u.IsActive ? "" : "is-inactive")">
+                    <td class="cell-name">
+                        <div class="person">
+                            <span class="person__avatar" aria-hidden="true">@initial</span>
+                            <span>@u.Name @if (isSelf) { <span class="you-tag">you</span> }</span>
+                        </div>
                     </td>
-                    <td style="padding:8px; border-bottom:1px solid #eee;">@u.Email</td>
-                    <td style="padding:8px; border-bottom:1px solid #eee;">@u.Phone</td>
-                    <td style="padding:8px; border-bottom:1px solid #eee;">@string.Join(", ", u.Roles)</td>
-                    <td style="padding:8px; border-bottom:1px solid #eee;">
+                    <td data-label="Email">@u.Email</td>
+                    <td data-label="Phone">@u.Phone</td>
+                    <td data-label="Roles">
+                        <span>
+                            @foreach (var r in u.Roles)
+                            {
+                                <span class="pill">@r</span>
+                            }
+                        </span>
+                    </td>
+                    <td data-label="Status">
                         @if (u.IsActive)
                         {
-                            <span style="color:#166534; font-weight:600;">Active</span>
+                            <span class="status status--on">Active</span>
                         }
                         else
                         {
-                            <span style="color:#991b1b; font-weight:600;">Inactive</span>
+                            <span class="status status--off">Inactive</span>
                         }
                     </td>
-                    <td style="padding:8px; border-bottom:1px solid #eee;">
+                    <td data-label="Last Login" class="muted">
                         @(u.LastLoginAt?.ToString("yyyy-MM-dd HH:mm") ?? "—")
                     </td>
-                    <td style="padding:8px; border-bottom:1px solid #eee; white-space:nowrap;">
+                    <td class="cell-actions">
                         @if (isSelf)
                         {
-                            <span style="color:#9ca3af;">—</span>
+                            <span class="muted">—</span>
                         }
                         else
                         {
-                            <a href="/Admin/EditUser/@u.Id"
-                               style="color:#2563eb; text-decoration:none; margin-right:10px;">
-                                ✏️ Edit
+                            <a href="/Admin/EditUser/@u.Id" class="row-action row-action--edit">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                                Edit
                             </a>
 
-                            <a href="/Admin/ResetPassword/@u.Id"
-                               style="color:#d97706; text-decoration:none; margin-right:10px;">
-                                🔑 Reset Pwd
+                            <a href="/Admin/ResetPassword/@u.Id" class="row-action row-action--reset">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 21 2M16 7l3 3"/></svg>
+                                Reset Pwd
                             </a>
 
-                            <form method="post" asp-action="ToggleActive" style="display:inline; margin-right:10px;">
+                            <form method="post" asp-action="ToggleActive">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@u.Id" />
-                                <button type="submit"
-                                        style="background:none; border:none; cursor:pointer; padding:0; color:@(u.IsActive ? "#7c3aed" : "#16a34a"); font-weight:600;">
-                                    @(u.IsActive ? "⏸ Deactivate" : "▶ Activate")
+                                <button type="submit" class="row-action @(u.IsActive ? "row-action--off" : "row-action--on")">
+                                    @if (u.IsActive)
+                                    {
+                                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+                                        <text>Deactivate</text>
+                                    }
+                                    else
+                                    {
+                                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5v14l12-7Z"/></svg>
+                                        <text>Activate</text>
+                                    }
                                 </button>
                             </form>
 
-                            <form method="post" asp-action="DeleteUser" style="display:inline;"
+                            <form method="post" asp-action="DeleteUser"
                                   onsubmit="return confirm('Delete @u.Name permanently? This cannot be undone.');">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@u.Id" />
-                                <button type="submit"
-                                        style="background:none; border:none; color:#dc2626; cursor:pointer; padding:0; font-weight:600;">
-                                    🗑 Delete
+                                <button type="submit" class="row-action row-action--del">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>
+                                    Delete
                                 </button>
                             </form>
                         }
-
                     </td>
                 </tr>
             }

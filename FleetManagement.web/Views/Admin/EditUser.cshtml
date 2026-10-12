@@ -3,60 +3,67 @@
     ViewData["Title"] = "Edit User";
 }
 
-<div style="font-family: sans-serif; padding: 30px; max-width: 500px; margin: 0 auto;">
-    <h1>Edit User</h1>
-    <p><a href="/Admin/UserList">← Back to list</a></p>
+<div class="form-wrap">
+    <a href="/Admin/UserList" class="back-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+        Back to list
+    </a>
 
-    <form asp-action="EditUser" method="post" style="margin-top: 20px;">
-        @Html.AntiForgeryToken()
-        <input type="hidden" asp-for="Id" />
+    <h1 class="page-head__title mb-3">Edit User</h1>
 
-        <div style="margin-bottom: 15px;">
-            <label>Full Name</label>
-            <input asp-for="Name" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;" />
-            <span asp-validation-for="Name" style="color:red; font-size:12px;"></span>
-        </div>
+    <div class="form-card" style="max-width:none;">
+        <form asp-action="EditUser" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
 
-        <div style="margin-bottom: 15px;">
-            <label>Email</label>
-            <input asp-for="Email" type="email" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;" />
-            <span asp-validation-for="Email" style="color:red; font-size:12px;"></span>
-        </div>
-
-        <div style="margin-bottom: 15px;">
-            <label>Phone</label>
-            <input asp-for="Phone" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;" />
-        </div>
-
-        <div style="margin-bottom: 15px;">
-            <label>Role</label>
-            <select asp-for="Role" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
-                <option value="driver">Driver</option>
-                <option value="manager">Manager</option>
-                <option value="viewer">Viewer</option>
-                <option value="admin">Admin</option>
-            </select>
-        </div>
-
-        <div style="margin-bottom: 15px;">
-            <label>
-                <input asp-for="IsActive" type="checkbox" /> Active
-            </label>
-        </div>
-
-        @if (!ViewData.ModelState.IsValid)
-        {
-            <div style="color:red; margin-bottom: 15px;">
-                @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    <div>@err.ErrorMessage</div>
-                }
+            <div class="field">
+                <label asp-for="Name">Full Name</label>
+                <input asp-for="Name" class="input" autocomplete="name" />
+                <span asp-validation-for="Name" class="field-error"></span>
             </div>
-        }
 
-        <button type="submit"
-                style="padding: 10px 20px; background:#2563eb; color:white; border:none; border-radius:4px; cursor:pointer;">
-            Save Changes
-        </button>
-    </form>
+            <div class="field">
+                <label asp-for="Email">Email</label>
+                <input asp-for="Email" type="email" class="input" autocomplete="email" />
+                <span asp-validation-for="Email" class="field-error"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="Phone">Phone</label>
+                <input asp-for="Phone" class="input" inputmode="tel" autocomplete="tel" />
+            </div>
+
+            <div class="field">
+                <label asp-for="Role">Role</label>
+                <select asp-for="Role" class="input">
+                    <option value="driver">Driver</option>
+                    <option value="manager">Manager</option>
+                    <option value="viewer">Viewer</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label class="check-row">
+                    <input asp-for="IsActive" type="checkbox" /> Active
+                </label>
+            </div>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert-box alert-box--err" role="alert">
+                    <div>
+                        @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <div>@err.ErrorMessage</div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="form-actions">
+                <button type="submit" class="btn-signal">Save Changes</button>
+            </div>
+        </form>
+    </div>
 </div>

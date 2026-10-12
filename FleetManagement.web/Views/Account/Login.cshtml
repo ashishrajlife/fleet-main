@@ -4,51 +4,64 @@
     ViewData["Title"] = "Login";
 }
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#e7ebf1" />
     <title>Login - Fleet Management</title>
-    <style>
-        body { font-family: sans-serif; background: #f5f5f5; display: flex;
-               justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 30px; border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.08); width: 320px; }
-        h2 { margin-top: 0; text-align: center; color: #333; }
-        label { display: block; margin-top: 12px; font-size: 14px; color: #555; }
-        input[type=email], input[type=password] {
-            width: 100%; padding: 10px; margin-top: 4px;
-            border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
-        }
-        button { width: 100%; padding: 10px; margin-top: 20px;
-                 background: #2563eb; color: white; border: none;
-                 border-radius: 4px; cursor: pointer; font-size: 15px; }
-        button:hover { background: #1e40af; }
-        .error { color: #dc2626; font-size: 13px; margin-top: 10px; text-align: center; }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>*, *::before, *::after { box-sizing: border-box; }</style>
 </head>
 <body>
-    <div class="card">
-        <h2>Fleet Login</h2>
-        <form asp-action="Login" method="post">
-            @Html.AntiForgeryToken()
-            <label>Email</label>
-            <input type="email" name="Email" required autofocus />
+    <div class="auth">
 
-            <label>Password</label>
-            <input type="password" name="Password" required />
+        <aside class="auth__panel">
+            <div class="auth__brand">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                Radhe-travels
+            </div>
+            <p class="auth__tagline">Fleet management, all in one place.</p>
+        </aside>
 
-            <button type="submit">Login</button>
+        <main class="auth__main">
+            <div class="auth__card">
+                <h1 class="auth__title">Fleet Login</h1>
+                <p class="auth__sub">Enter your email and password to continue.</p>
 
-            @if (!ViewData.ModelState.IsValid)
-            {
-                <div class="error">
-                    @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                <form asp-action="Login" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="field">
+                        <label for="Email">Email</label>
+                        <input class="input" id="Email" type="email" name="Email" autocomplete="username" required autofocus />
+                    </div>
+
+                    <div class="field">
+                        <label for="Password">Password</label>
+                        <input class="input" id="Password" type="password" name="Password" autocomplete="current-password" required />
+                    </div>
+
+                    @if (!ViewData.ModelState.IsValid)
                     {
-                        <div>@err.ErrorMessage</div>
+                        <div class="alert-box alert-box--err" role="alert">
+                            <div>
+                                @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                {
+                                    <div>@err.ErrorMessage</div>
+                                }
+                            </div>
+                        </div>
                     }
-                </div>
-            }
-        </form>
+
+                    <button type="submit" class="btn-signal">Login</button>
+                </form>
+            </div>
+        </main>
+
     </div>
 </body>
 </html>

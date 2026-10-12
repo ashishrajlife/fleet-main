@@ -1,46 +1,103 @@
-﻿<!DOCTYPE html>
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+    var userName = User.Identity?.Name;
+    var initial = string.IsNullOrEmpty(userName) ? "U" : userName.Substring(0, 1).ToUpper();
+
+    // Dashboard shortcut for the roles that have one
+    string dashboardUrl = null;
+    if (User.IsInRole("admin") || User.IsInRole("Admin")) { dashboardUrl = "/Admin/Dashboard"; }
+    else if (User.IsInRole("manager") || User.IsInRole("Manager")) { dashboardUrl = "/Manager/Dashboard"; }
+
+    var homeActive = controller == "Home" && action == "Index";
+    var privacyActive = action == "Privacy";
+    var dashboardActive = action == "Dashboard";
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#e7ebf1" />
     <title>@ViewData["Title"] - FleetManagement.web</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FleetManagement.web.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Radhe-travels</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+    <div class="app">
+
+        <header class="topbar">
+            <a class="brand" asp-area="" asp-controller="Home" asp-action="Index">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                Radhe-travels
+            </a>
+
+            @if (isAuthenticated)
+            {
+                <div class="dropdown">
+                    <button class="user-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account menu">
+                        <span class="user-btn__avatar" aria-hidden="true">@initial</span>
+                        <span class="user-btn__name">@userName</span>
+                        <svg class="user-btn__caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end user-menu">
+                        <div class="user-menu__head">
+                            <small>Signed in as</small>
+                            <strong>@userName</strong>
+                        </div>
+                        <form asp-controller="Account" asp-action="Logout" method="post">
+                            <button type="submit" class="dropdown-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+                                Logout
+                            </button>
+                        </form>
+                    </div>
                 </div>
-            </div>
+            }
+        </header>
+
+        <nav class="rail" aria-label="Main navigation">
+            <a class="rail__link @(homeActive ? "active" : "")" data-label="Home"
+               aria-current="@(homeActive ? "page" : null)"
+               asp-area="" asp-controller="Home" asp-action="Index">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg>
+                <span class="rail__text">Home</span>
+            </a>
+
+            @if (dashboardUrl != null)
+            {
+                <a class="rail__link @(dashboardActive ? "active" : "")" data-label="Dashboard"
+                   aria-current="@(dashboardActive ? "page" : null)"
+                   href="@dashboardUrl">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>
+                    <span class="rail__text">Dashboard</span>
+                </a>
+            }
+
+            <a class="rail__link @(privacyActive ? "active" : "")" data-label="Privacy"
+               aria-current="@(privacyActive ? "page" : null)"
+               asp-area="" asp-controller="Home" asp-action="Privacy">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.4 8.4 8 9 4.6-.6 8-4 8-9V6Z"/><path d="m9 12 2 2 4-4"/></svg>
+                <span class="rail__text">Privacy</span>
+            </a>
         </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+
+        <main role="main" class="page">
             @RenderBody()
         </main>
+
+        <footer class="site-footer">
+            <span>&copy; 2026 - FleetManagement.web</span>
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </footer>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - FleetManagement.web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
