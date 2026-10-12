@@ -15,13 +15,19 @@ namespace FleetManagement.Web.Controllers
 
         public IActionResult Dashboard() => View();
 
+        // =========================================================
+        // LIST — drivers + viewers + self
+        // =========================================================
         public async Task<IActionResult> UserList()
         {
-            var result = await _users.GetForManagerAsync();
+            var result = await _users.GetForManagerAsync(User.Identity?.Name ?? "");
             if (!result.Succeeded) return BadRequest(result.Errors);
             return View(result.Data);
         }
 
+        // =========================================================
+        // CREATE — driver/viewer only
+        // =========================================================
         [HttpGet]
         public IActionResult CreateUser() => View(new CreateUserRequest { Role = "driver" });
 
@@ -48,6 +54,9 @@ namespace FleetManagement.Web.Controllers
             return RedirectToAction("UserList");
         }
 
+        // =========================================================
+        // EDIT — only driver/viewer (self edit is separate)
+        // =========================================================
         [HttpGet]
         public async Task<IActionResult> EditUser(string id)
         {
@@ -80,6 +89,11 @@ namespace FleetManagement.Web.Controllers
                 return View(req);
             }
 
+            // Scope check — target must be driver/viewer
+            var target = await _users.GetByIdAsync(req.Id);
+            if (!target.Succeeded) return NotFound();
+            if (!target.Data!.Roles.Any(r => ManageableRoles.Contains(r))) return Forbid();
+
             var result = await _users.UpdateAsync(req);
             if (!result.Succeeded)
             {
@@ -91,6 +105,9 @@ namespace FleetManagement.Web.Controllers
             return RedirectToAction("UserList");
         }
 
+        // =========================================================
+        // TOGGLE ACTIVE — driver/viewer only
+        // =========================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleActive(string id)
@@ -107,6 +124,9 @@ namespace FleetManagement.Web.Controllers
             return RedirectToAction("UserList");
         }
 
+        // =========================================================
+        // RESET PASSWORD — driver/viewer only
+        // =========================================================
         [HttpGet]
         public async Task<IActionResult> ResetPassword(string id)
         {
@@ -138,6 +158,49 @@ namespace FleetManagement.Web.Controllers
             return RedirectToAction("UserList");
         }
 
-        // No DeleteUser
+        // =========================================================
+        // PROFILE — self edit (name + phone)
+        // =========================================================
+        [HttpGet]
+    public async Task<IActionResult> Profile()
+    {
+        var result = await _users.GetProfileAsync(User.Identity?.Name ?? "");
+        if (!result.Succeeded) return NotFound();
+        return View(result.Data);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> EditProfile()
+    {
+        var result = await _users.GetProfileAsync(User.Identity?.Name ?? "");
+        if (!result.Succeeded) return NotFound();
+
+        var u = result.Data!;
+        return View(new UpdateProfileRequest
+        {
+            Id = u.Id,
+            Name = u.Name,
+            Phone = u.Phone
+        });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditProfile(UpdateProfileRequest req)
+    {
+        if (!ModelState.IsValid) return View(req);
+
+        var result = await _users.UpdateProfileAsync(req, User.Identity?.Name ?? "");
+        if (!result.Succeeded)
+        {
+            foreach (var err in result.Errors) ModelState.AddModelError("", err);
+            return View(req);
+        }
+
+        TempData["Success"] = "Profile updated.";
+        return RedirectToAction("Profile");
+    }
+
+
+  }
 }

@@ -13,6 +13,8 @@ namespace FleetManagement.Web.Services
         Task<ServiceResult> DeleteAsync(string id, string actorEmail);
 
         // Manager ke liye scoped list
-        Task<ServiceResult<List<UserResponse>>> GetForManagerAsync();
+        Task<ServiceResult<List<UserResponse>>> GetForManagerAsync(string actorEmail);
+        Task<ServiceResult<UserResponse>> UpdateProfileAsync(UpdateProfileRequest req, string actorEmail);
+        Task<ServiceResult<UserResponse>> GetProfileAsync(string actorEmail);
     }
 }

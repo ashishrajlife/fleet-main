@@ -1,44 +1,98 @@
 @model List<FleetManagement.Web.Models.UserResponse>
 @{
-    ViewData["Title"] = "All Users";
+    ViewData["Title"] = "Manage Users";
+    var currentEmail = User.Identity?.Name ?? "";
 }
 
-<div style="font-family: sans-serif; padding: 30px; max-width: 900px; margin: 0 auto;">
-    <h1>All Users</h1>
+<div style="font-family: sans-serif; padding: 30px; max-width: 1100px; margin: 0 auto;">
+    <h1>Manage Drivers & Viewers</h1>
     <p>
-       <a href="/Manager/Dashboard">← Dashboard</a> |
-        <a href="/Admin/CreateUser">➕ Create User</a>
+        <a href="/Manager/Dashboard">← Dashboard</a> |
+        <a href="/Manager/CreateUser">➕ Create Driver / Viewer</a>
     </p>
 
+    @if (TempData["Success"] != null)
+    {
+        <div style="background:#dcfce7; color:#166534; padding:10px; border-radius:4px; margin:15px 0;">
+            @TempData["Success"]
+        </div>
+    }
     @if (TempData["Error"] != null)
-{
-    <div style="background:#fee2e2; color:#991b1b; padding:10px; border-radius:4px; margin:15px 0;">
-        @TempData["Error"]
-    </div>
-}
+    {
+        <div style="background:#fee2e2; color:#991b1b; padding:10px; border-radius:4px; margin:15px 0;">
+            @TempData["Error"]
+        </div>
+    }
 
-    <table style="width:100%; border-collapse: collapse; margin-top: 20px;">
+    <table style="width:100%; border-collapse: collapse; margin-top: 20px; font-size:14px;">
         <thead>
             <tr style="background:#f3f4f6; text-align:left;">
                 <th style="padding:8px; border-bottom:1px solid #ddd;">Name</th>
                 <th style="padding:8px; border-bottom:1px solid #ddd;">Email</th>
                 <th style="padding:8px; border-bottom:1px solid #ddd;">Phone</th>
                 <th style="padding:8px; border-bottom:1px solid #ddd;">Roles</th>
-                <th style="padding:8px; border-bottom:1px solid #ddd;">Active</th>
+                <th style="padding:8px; border-bottom:1px solid #ddd;">Status</th>
                 <th style="padding:8px; border-bottom:1px solid #ddd;">Last Login</th>
+                <th style="padding:8px; border-bottom:1px solid #ddd;">Actions</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var u in Model)
             {
-                <tr>
-                    <td style="padding:8px; border-bottom:1px solid #eee;">@u.Name</td>
+                var isSelf = u.Email == currentEmail;
+                <tr style="@(u.IsActive ? "" : "opacity:0.55;")">
+                    <td style="padding:8px; border-bottom:1px solid #eee;">
+                        @u.Name @(isSelf ? " (you)" : "")
+                    </td>
                     <td style="padding:8px; border-bottom:1px solid #eee;">@u.Email</td>
                     <td style="padding:8px; border-bottom:1px solid #eee;">@u.Phone</td>
                     <td style="padding:8px; border-bottom:1px solid #eee;">@string.Join(", ", u.Roles)</td>
-                    <td style="padding:8px; border-bottom:1px solid #eee;">@(u.IsActive ? "Yes" : "No")</td>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">
+                        @if (u.IsActive)
+                        {
+                            <span style="color:#166534; font-weight:600;">Active</span>
+                        }
+                        else
+                        {
+                            <span style="color:#991b1b; font-weight:600;">Inactive</span>
+                        }
+                    </td>
                     <td style="padding:8px; border-bottom:1px solid #eee;">
                         @(u.LastLoginAt?.ToString("yyyy-MM-dd HH:mm") ?? "—")
+                    </td>
+                    <td style="padding:8px; border-bottom:1px solid #eee; white-space:nowrap;">
+
+                        @if (isSelf)
+                        {
+                            <a href="/Manager/Profile"
+                               style="color:#7c3aed; text-decoration:none; font-weight:600;">
+                                👤 My Profile
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="/Manager/EditUser/@u.Id"
+                               style="color:#2563eb; text-decoration:none; margin-right:10px;">
+                                ✏️ Edit
+                            </a>
+
+                            <a href="/Manager/ResetPassword/@u.Id"
+                               style="color:#d97706; text-decoration:none; margin-right:10px;">
+                                🔑 Reset Pwd
+                            </a>
+
+                            <form method="post" asp-action="ToggleActive" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@u.Id" />
+                                <button type="submit"
+                                        style="background:none; border:none; cursor:pointer; padding:0; color:@(u.IsActive ? "#7c3aed" : "#16a34a"); font-weight:600;">
+                                    @(u.IsActive ? "⏸ Deactivate" : "▶ Activate")
+                                </button>
+                            </form>
+
+                            @* Manager ke paas Delete nahi hai *@
+                        }
+
                     </td>
                 </tr>
             }
