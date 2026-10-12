@@ -61,13 +61,9 @@
                         @(u.LastLoginAt?.ToString("yyyy-MM-dd HH:mm") ?? "—")
                     </td>
                     <td style="padding:8px; border-bottom:1px solid #eee; white-space:nowrap;">
-
                         @if (isSelf)
                         {
-                            <a href="/Admin/Profile"
-                               style="color:#7c3aed; text-decoration:none; font-weight:600;">
-                                👤 My Profile
-                            </a>
+                            <span style="color:#9ca3af;">—</span>
                         }
                         else
                         {

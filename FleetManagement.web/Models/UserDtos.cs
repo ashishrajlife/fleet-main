@@ -57,11 +57,4 @@ namespace FleetManagement.Web.Models
         public static ServiceResult<T> Ok(T data) => new() { Succeeded = true, Data = data };
         public static new ServiceResult<T> Fail(params string[] errors) => new() { Succeeded = false, Errors = errors.ToList() };
     }
-
-    public class UpdateProfileRequest
-    {
-        [Required] public string Id { get; set; } = "";
-        [Required] public string Name { get; set; } = "";
-        public string? Phone { get; set; }
-    }
 }

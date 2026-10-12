@@ -33,7 +33,7 @@ namespace FleetManagement.Web.Services
         }
 
         // =========================================================
-        // READ — only drivers + viewers (for manager)
+        // READ — drivers + viewers + self (for manager)
         // =========================================================
         public async Task<ServiceResult<List<UserResponse>>> GetForManagerAsync(string actorEmail)
         {
@@ -50,7 +50,6 @@ namespace FleetManagement.Web.Services
                 if (isSelf || isManageable)
                     list.Add(Map(u, roles));
             }
-
             return ServiceResult<List<UserResponse>>.Ok(list);
         }
 
@@ -103,15 +102,20 @@ namespace FleetManagement.Web.Services
         // =========================================================
         // UPDATE
         // =========================================================
-        public async Task<ServiceResult<UserResponse>> UpdateAsync(UpdateUserRequest req)
+        public async Task<ServiceResult<UserResponse>> UpdateAsync(UpdateUserRequest req, string actorEmail)
         {
             var user = await _userManager.FindByIdAsync(req.Id);
             if (user == null) return ServiceResult<UserResponse>.Fail("User not found.");
+
+            // Prevent self-edit
+            if (user.Email == actorEmail)
+                return ServiceResult<UserResponse>.Fail("You cannot edit your own account.");
 
             var newRole = req.Role.ToLower().Trim();
             if (!AllRoles.Contains(newRole))
                 return ServiceResult<UserResponse>.Fail("Invalid role.");
 
+            // Handle email change
             if (user.Email != req.Email)
             {
                 var existing = await _userManager.FindByEmailAsync(req.Email);
@@ -133,6 +137,7 @@ namespace FleetManagement.Web.Services
             if (!update.Succeeded)
                 return ServiceResult<UserResponse>.Fail(update.Errors.Select(e => e.Description).ToArray());
 
+            // Sync role
             var currentRoles = await _userManager.GetRolesAsync(user);
             if (!currentRoles.Contains(newRole))
             {
@@ -214,43 +219,5 @@ namespace FleetManagement.Web.Services
             LastLoginAt = u.LastLoginAt,
             CreatedAt = u.CreatedAt
         };
-
-        // =========================================================
-// GET OWN PROFILE
-// =========================================================
-public async Task<ServiceResult<UserResponse>> GetProfileAsync(string actorEmail)
-{
-    var user = await _userManager.FindByEmailAsync(actorEmail);
-    if (user == null) return ServiceResult<UserResponse>.Fail("Profile not found.");
-
-    var roles = await _userManager.GetRolesAsync(user);
-    return ServiceResult<UserResponse>.Ok(Map(user, roles));
-}
-
-// =========================================================
-// UPDATE OWN PROFILE (name + phone only)
-// =========================================================
-    public async Task<ServiceResult<UserResponse>> UpdateProfileAsync(UpdateProfileRequest req, string actorEmail)
-    {
-        var user = await _userManager.FindByEmailAsync(actorEmail);
-        if (user == null) return ServiceResult<UserResponse>.Fail("Profile not found.");
-
-        // Safety: only allow updating your OWN record
-        if (user.Id != req.Id)
-            return ServiceResult<UserResponse>.Fail("You can only update your own profile.");
-
-        user.Name = req.Name;
-        user.PhoneNumber = req.Phone;
-        user.UpdatedAt = DateTime.UtcNow;
-
-        var result = await _userManager.UpdateAsync(user);
-        if (!result.Succeeded)
-            return ServiceResult<UserResponse>.Fail(result.Errors.Select(e => e.Description).ToArray());
-
-        var roles = await _userManager.GetRolesAsync(user);
-        return ServiceResult<UserResponse>.Ok(Map(user, roles));
-    }
-
-
     }
 }

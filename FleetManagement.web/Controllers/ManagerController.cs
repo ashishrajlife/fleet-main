@@ -78,32 +78,31 @@ namespace FleetManagement.Web.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditUser(UpdateUserRequest req)
-        {
-            if (!ModelState.IsValid) return View(req);
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> EditUser(UpdateUserRequest req)
+{
+    if (!ModelState.IsValid) return View(req);
 
-            if (!ManageableRoles.Contains(req.Role.ToLower()))
-            {
-                ModelState.AddModelError("Role", "You can only assign driver or viewer.");
-                return View(req);
-            }
+    if (!ManageableRoles.Contains(req.Role.ToLower()))
+    {
+        ModelState.AddModelError("Role", "You can only assign driver or viewer.");
+        return View(req);
+    }
 
-            // Scope check — target must be driver/viewer
-            var target = await _users.GetByIdAsync(req.Id);
-            if (!target.Succeeded) return NotFound();
-            if (!target.Data!.Roles.Any(r => ManageableRoles.Contains(r))) return Forbid();
+    var target = await _users.GetByIdAsync(req.Id);
+    if (!target.Succeeded) return NotFound();
+    if (!target.Data!.Roles.Any(r => ManageableRoles.Contains(r))) return Forbid();
 
-            var result = await _users.UpdateAsync(req);
-            if (!result.Succeeded)
-            {
-                foreach (var err in result.Errors) ModelState.AddModelError("", err);
-                return View(req);
-            }
+    var result = await _users.UpdateAsync(req, User.Identity?.Name ?? "");
+    if (!result.Succeeded)
+    {
+        foreach (var err in result.Errors) ModelState.AddModelError("", err);
+        return View(req);
+    }
 
-            TempData["Success"] = "User updated.";
-            return RedirectToAction("UserList");
-        }
+    TempData["Success"] = "User updated.";
+    return RedirectToAction("UserList");
+}
 
         // =========================================================
         // TOGGLE ACTIVE — driver/viewer only
@@ -157,50 +156,6 @@ namespace FleetManagement.Web.Controllers
             TempData["Success"] = "Password reset.";
             return RedirectToAction("UserList");
         }
-
-        // =========================================================
-        // PROFILE — self edit (name + phone)
-        // =========================================================
-        [HttpGet]
-    public async Task<IActionResult> Profile()
-    {
-        var result = await _users.GetProfileAsync(User.Identity?.Name ?? "");
-        if (!result.Succeeded) return NotFound();
-        return View(result.Data);
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> EditProfile()
-    {
-        var result = await _users.GetProfileAsync(User.Identity?.Name ?? "");
-        if (!result.Succeeded) return NotFound();
-
-        var u = result.Data!;
-        return View(new UpdateProfileRequest
-        {
-            Id = u.Id,
-            Name = u.Name,
-            Phone = u.Phone
-        });
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> EditProfile(UpdateProfileRequest req)
-    {
-        if (!ModelState.IsValid) return View(req);
-
-        var result = await _users.UpdateProfileAsync(req, User.Identity?.Name ?? "");
-        if (!result.Succeeded)
-        {
-            foreach (var err in result.Errors) ModelState.AddModelError("", err);
-            return View(req);
-        }
-
-        TempData["Success"] = "Profile updated.";
-        return RedirectToAction("Profile");
-    }
-
 
   }
 }
