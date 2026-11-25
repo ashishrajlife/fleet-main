@@ -1,0 +1,97 @@
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    var currentUser = await UserManager.GetUserAsync(User);
+    var roles = currentUser is not null ? await UserManager.GetRolesAsync(currentUser) : new List<string>();
+    var role = roles.FirstOrDefault() ?? "User";
+}
+<div class="wrap">
+    <h1>Admin dashboard</h1>
+    <p class="lead">Welcome back, <b>@currentUser?.Email</b> — here is your fleet overview.</p>
+
+    <div class="grid">
+        <!-- Left: quick stats / actions -->
+        <aside class="panel-card">
+            <h3>Overview</h3>
+
+            <div class="stat-row">
+                <div class="stat">
+                    <small>Users</small>
+                    <b>@ViewBag.UserCount</b>
+                </div>
+                <div class="stat">
+                    <small>Roles</small>
+                    <b>@ViewBag.RoleCount</b>
+                </div>
+            </div>
+
+            <div class="stat-row">
+                <div class="stat">
+                    <small>Vehicles</small>
+                    <b>—</b>
+                </div>
+                <div class="stat">
+                    <small>Active trips</small>
+                    <b>—</b>
+                </div>
+            </div>
+
+            <h3 style="margin-top:22px">Quick actions</h3>
+            <button class="btn" type="button">+ Add vehicle</button>
+            <button class="ghost" type="button" style="width:100%;margin-top:10px">Dispatch a trip</button>
+            <button class="ghost" type="button" style="width:100%;margin-top:10px">Manage users</button>
+            <div class="msg ok" id="dashMsg"></div>
+        </aside>
+
+        <!-- Right: recent users table -->
+        <section class="panel-card">
+            <h3>Recent users</h3>
+            @if (ViewBag.RecentUsers is List<IdentityUser> users && users.Count > 0)
+            {
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Confirmed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var u in users)
+                        {
+                            <tr>
+                                <td>
+                                    @u.Email
+                                    <small>@u.Id.Substring(0, 8)…</small>
+                                </td>
+                                <td>
+                                    <span class="chip @(u.LockoutEnd is null || u.LockoutEnd < DateTimeOffset.UtcNow ? "on" : "off")">
+                                        @(u.LockoutEnd is null || u.LockoutEnd < DateTimeOffset.UtcNow ? "Active" : "Locked")
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="chip @(u.EmailConfirmed ? "on" : "off")">
+                                        @(u.EmailConfirmed ? "Yes" : "No")
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="empty">No users yet.</div>
+            }
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    document.getElementById('dashMsg').textContent = '';
+</script>
+}
