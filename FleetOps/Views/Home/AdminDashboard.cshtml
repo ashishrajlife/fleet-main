@@ -5,48 +5,106 @@
     var currentUser = await UserManager.GetUserAsync(User);
     var roles = currentUser is not null ? await UserManager.GetRolesAsync(currentUser) : new List<string>();
     var role = roles.FirstOrDefault() ?? "User";
+
+    var labels = ViewBag.TrendLabels as List<string> ?? new List<string>();
+    var values = ViewBag.TrendValues as List<int> ?? new List<int>();
+    var maxVal = values.Count > 0 ? Math.Max(values.Max(), 1) : 1;
+    var util = ViewBag.Utilization as int? ?? 0;
 }
 <div class="wrap">
     <h1>Admin dashboard</h1>
     <p class="lead">Welcome back, <b>@currentUser?.Email</b> — here is your fleet overview.</p>
 
-    <div class="grid">
-        <!-- Left: quick stats / actions -->
-        <aside class="panel-card">
-            <h3>Overview</h3>
+    <!-- KPI row -->
+    <section class="kpis">
+        <div class="kpi">
+            <div class="k-top">
+                <small>Users</small>
+                <span class="k-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17.5" cy="9" r="2.5"/><path d="M14.5 20a5 5 0 0 1 7 0"/></svg>
+                </span>
+            </div>
+            <b>@ViewBag.UserCount</b>
+            <span class="delta up">▲ active accounts</span>
+        </div>
 
-            <div class="stat-row">
-                <div class="stat">
-                    <small>Users</small>
-                    <b>@ViewBag.UserCount</b>
-                </div>
-                <div class="stat">
-                    <small>Roles</small>
-                    <b>@ViewBag.RoleCount</b>
+        <div class="kpi">
+            <div class="k-top">
+                <small>Roles</small>
+                <span class="k-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3z"/><path d="m9 12 2 2 4-4"/></svg>
+                </span>
+            </div>
+            <b>@ViewBag.RoleCount</b>
+            <span class="delta">defined in system</span>
+        </div>
+
+        <div class="kpi">
+            <div class="k-top">
+                <small>Vehicles</small>
+                <span class="k-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16V7a2 2 0 0 1 2-2h9v11"/><path d="M14 9h4l3 3v4h-7"/><circle cx="7.5" cy="17.5" r="2"/><circle cx="17.5" cy="17.5" r="2"/></svg>
+                </span>
+            </div>
+            <b>—</b>
+            <span class="delta">add Vehicles module</span>
+        </div>
+
+        <div class="kpi">
+            <div class="k-top">
+                <small>Active trips</small>
+                <span class="k-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="m7 6 5-4 5 4"/><path d="m7 18 5 4 5-4"/></svg>
+                </span>
+            </div>
+            <b>—</b>
+            <span class="delta">add Trips module</span>
+        </div>
+    </section>
+
+    <!-- Charts row -->
+    <section class="grid">
+        <div class="panel-card">
+            <div class="head">
+                <h3>Weekly activity</h3>
+                <span class="chip info">Last 7 days</span>
+            </div>
+            <div class="chart" role="img" aria-label="Weekly activity bar chart">
+                @for (int i = 0; i < labels.Count; i++)
+                {
+                    var v = values[i];
+                    var h = (int)Math.Round((double)v / maxVal * 100);
+                    <div class="col">
+                        <span class="val">@v</span>
+                        <div class="bar" style="height:@(h)%"></div>
+                        <span class="lbl">@labels[i]</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="panel-card">
+            <div class="head">
+                <h3>Fleet utilization</h3>
+                <span class="chip on">Live</span>
+            </div>
+            <div class="donut-wrap">
+                <div class="donut" style="--p:@util"><span>@util%</span></div>
+                <div class="legend">
+                    <div><i></i> Active <b>@util%</b></div>
+                    <div><i class="v2"></i> Idle <b>@(100 - util)%</b></div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div class="stat-row">
-                <div class="stat">
-                    <small>Vehicles</small>
-                    <b>—</b>
-                </div>
-                <div class="stat">
-                    <small>Active trips</small>
-                    <b>—</b>
-                </div>
+    <!-- Bottom row -->
+    <section class="grid" style="margin-top:20px">
+        <div class="panel-card">
+            <div class="head">
+                <h3>Recent users</h3>
+                <button class="ghost" type="button">View all</button>
             </div>
-
-            <h3 style="margin-top:22px">Quick actions</h3>
-            <button class="btn" type="button">+ Add vehicle</button>
-            <button class="ghost" type="button" style="width:100%;margin-top:10px">Dispatch a trip</button>
-            <button class="ghost" type="button" style="width:100%;margin-top:10px">Manage users</button>
-            <div class="msg ok" id="dashMsg"></div>
-        </aside>
-
-        <!-- Right: recent users table -->
-        <section class="panel-card">
-            <h3>Recent users</h3>
             @if (ViewBag.RecentUsers is List<IdentityUser> users && users.Count > 0)
             {
                 <div class="table-wrap">
@@ -86,12 +144,22 @@
             {
                 <div class="empty">No users yet.</div>
             }
-        </section>
-    </div>
+        </div>
+
+        <div class="panel-card">
+            <h3>Quick actions</h3>
+            <button class="btn" type="button">+ Add vehicle</button>
+            <button class="ghost" type="button" style="width:100%;margin-top:10px">Dispatch a trip</button>
+            <button class="ghost" type="button" style="width:100%;margin-top:10px">Manage users</button>
+            <button class="ghost" type="button" style="width:100%;margin-top:10px">Manage roles</button>
+            <div class="msg ok" id="dashMsg"></div>
+        </div>
+    </section>
 </div>
 
 @section Scripts {
 <script>
+    // Placeholder — wire real actions later
     document.getElementById('dashMsg').textContent = '';
 </script>
 }
