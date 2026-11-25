@@ -1,0 +1,27 @@
+@model FleetOps.Models.Vehicle
+@{
+    ViewData["Title"] = "Delete vehicle";
+}
+<div class="wrap">
+    <div class="page-head">
+        <div>
+            <h1>Delete vehicle</h1>
+            <p class="lead">This action cannot be undone.</p>
+        </div>
+        <a class="ghost" asp-action="Index">← Back</a>
+    </div>
+
+    <div class="panel-card">
+        <div class="alert show" role="alert">
+            <span>Are you sure you want to delete <b>@Model.RegistrationNumber</b> (@Model.Make @Model.Model)?</span>
+        </div>
+        <form asp-action="Delete" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <div class="form-actions">
+                <button type="submit" class="btn danger">Yes, delete</button>
+                <a class="ghost" asp-action="Index">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

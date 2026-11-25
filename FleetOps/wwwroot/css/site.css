@@ -296,3 +296,58 @@ td small{display:block;color:var(--muted)}
 .wrap h1, .card h2, .hero-copy h1{letter-spacing:-.035em}
 .panel-card h3{letter-spacing:-.01em}
 .kpi b, .stat b, .donut span{letter-spacing:-.03em;font-weight:700}
+/* ---------- Page head / forms / details (shared) ---------- */
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.page-head .lead{margin:4px 0 0}
+.btn-inline{width:auto;padding:0 22px;height:44px;font-size:14px;display:inline-flex;align-items:center;text-decoration:none}
+.btn-inline:hover{text-decoration:none}
+.btn.danger{background:linear-gradient(135deg,#e5484d,#ff6b81);box-shadow:0 10px 30px rgba(255,107,129,.35)}
+.btn.danger:hover{box-shadow:0 14px 36px rgba(255,107,129,.5)}
+.ghost.danger{color:var(--danger);border-color:rgba(255,107,129,.4)}
+.ghost.danger:hover{background:rgba(255,107,129,.1)}
+a.ghost{text-decoration:none}
+a.ghost:hover{text-decoration:none}
+
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.filters input,.filters select{height:40px;padding:0 12px;border-radius:10px;border:1px solid var(--line);
+  background:var(--input-bg);outline:none;font-size:14px}
+.filters input:focus,.filters select:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(91,140,255,.15)}
+.filters input{flex:1;min-width:200px;max-width:320px}
+.filters select{min-width:150px}
+.filters select option{background:var(--bg2);color:var(--text)}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:900px}
+.form-grid .field{margin:0}
+.form-grid .field-wide{grid-column:1 / -1}
+.form-grid .field textarea{width:100%;padding:14px;border-radius:var(--radius);border:1px solid var(--line);
+  background:var(--card);outline:none;resize:vertical;font-size:14px;color:var(--text)}
+.form-grid .field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(91,140,255,.15)}
+.form-grid .field textarea+label{top:14px;left:14px;position:absolute;pointer-events:none;color:var(--muted);transition:all .15s;font-size:15px}
+.form-grid .field textarea:focus+label,.form-grid .field textarea:not(:placeholder-shown)+label{top:-8px;left:10px;font-size:11px;background:var(--bg);padding:0 6px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+.form-grid .field select{height:56px;padding:22px 44px 6px 16px;width:100%;border-radius:var(--radius);border:1px solid var(--line);
+  background:var(--card);outline:none;appearance:none;color:var(--text);font-size:15px;cursor:pointer;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b95b1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat:no-repeat;background-position:right 14px center;background-size:18px}
+.form-grid .field select:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(91,140,255,.15)}
+.form-grid .field select+label{top:8px;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+.form-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.form-actions .btn{width:auto;padding:0 26px}
+.form-actions .ghost{height:54px;padding:0 22px}
+
+.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.detail-grid > div{display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:12px;background:var(--input-bg);border:1px solid var(--line)}
+.detail-grid small{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+.detail-grid b{font-weight:600}
+.notes-box{margin-top:16px;padding:14px;border-radius:12px;background:var(--input-bg);border:1px solid var(--line)}
+.notes-box small{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+.notes-box p{margin-top:6px}
+
+@media (max-width:900px){
+  .form-grid{grid-template-columns:1fr}
+  .detail-grid{grid-template-columns:1fr}
+}
+@media (max-width:480px){
+  .page-head{flex-direction:column;align-items:stretch}
+  .btn-inline{justify-content:center}
+  .filters input,.filters select{min-width:0;flex:1}
+}

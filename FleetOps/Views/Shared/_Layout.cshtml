@@ -66,7 +66,8 @@
 
             <nav class="nav-group">
                 <span class="label">Fleet</span>
-                <a class="nav-item" href="#" onclick="return false;">
+              <a class="nav-item @(IsActive("Vehicles","Index") || IsActive("Vehicles","Create") || IsActive("Vehicles","Edit") || IsActive("Vehicles","Details") || IsActive("Vehicles","Delete") ? "active" : "")"
+                asp-controller="Vehicles" asp-action="Index">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16V7a2 2 0 0 1 2-2h9v11"/><path d="M14 9h4l3 3v4h-7"/><circle cx="7.5" cy="17.5" r="2"/><circle cx="17.5" cy="17.5" r="2"/></svg>
                     Vehicles
                 </a>

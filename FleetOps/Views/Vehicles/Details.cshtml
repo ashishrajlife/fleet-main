@@ -1,0 +1,40 @@
+@model FleetOps.Models.Vehicle
+@{
+    ViewData["Title"] = "Vehicle details";
+    var chip = Model.Status == FleetOps.Models.VehicleStatus.Active ? "on"
+             : Model.Status == FleetOps.Models.VehicleStatus.InMaintenance ? "info" : "off";
+}
+<div class="wrap">
+    <div class="page-head">
+        <div>
+            <h1>@Model.RegistrationNumber</h1>
+            <p class="lead">@Model.Make @Model.Model · @Model.Year</p>
+        </div>
+        <div style="display:flex;gap:10px">
+            <a class="ghost" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+            <a class="ghost" asp-action="Index">← Back</a>
+        </div>
+    </div>
+
+    <section class="panel-card">
+        <div class="detail-grid">
+            <div><small>Status</small><span class="chip @chip">@Model.Status</span></div>
+            <div><small>Type</small><b>@Model.VehicleType</b></div>
+            <div><small>Fuel</small><b>@Model.FuelType</b></div>
+            <div><small>Capacity</small><b>@(Model.CapacityKg?.ToString("N0") ?? "—") kg</b></div>
+            <div><small>Odometer</small><b>@Model.OdometerKm.ToString("N0") km</b></div>
+            <div><small>Insurance expiry</small><b>@(Model.InsuranceExpiry?.ToString("dd MMM yyyy") ?? "—")</b></div>
+            <div><small>Fitness expiry</small><b>@(Model.FitnessExpiry?.ToString("dd MMM yyyy") ?? "—")</b></div>
+            <div><small>Purchase date</small><b>@(Model.PurchaseDate?.ToString("dd MMM yyyy") ?? "—")</b></div>
+            <div><small>Created</small><b>@Model.CreatedAt.ToString("dd MMM yyyy, HH:mm")</b></div>
+            <div><small>Updated</small><b>@Model.UpdatedAt.ToString("dd MMM yyyy, HH:mm")</b></div>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(Model.Notes))
+        {
+            <div class="notes-box">
+                <small>Notes</small>
+                <p>@Model.Notes</p>
+            </div>
+        }
+    </section>
+</div>

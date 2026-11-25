@@ -1,0 +1,91 @@
+@model List<FleetOps.Models.Vehicle>
+@{
+    ViewData["Title"] = "Vehicles";
+    var status = ViewBag.Status as FleetOps.Models.VehicleStatus?;
+    var type = ViewBag.Type as FleetOps.Models.VehicleType?;
+    var q = ViewBag.Q as string;
+}
+<div class="wrap">
+    <div class="page-head">
+        <div>
+            <h1>Vehicles</h1>
+            <p class="lead">Manage your fleet — @Model.Count vehicle(s).</p>
+        </div>
+        <a class="btn btn-inline" asp-action="Create">+ Add vehicle</a>
+    </div>
+
+    @if (TempData["Ok"] is string ok)
+    {
+        <div class="alert ok show" role="alert">
+            <span>@ok</span>
+        </div>
+    }
+
+    <form method="get" class="filters">
+        <input type="search" name="q" value="@q" placeholder="Search reg, make, model…" />
+        <select name="status">
+            <option value="">All statuses</option>
+            @foreach (var s in Enum.GetValues<FleetOps.Models.VehicleStatus>())
+            {
+                <option value="@s" selected="@(status == s)">@s</option>
+            }
+        </select>
+        <select name="type">
+            <option value="">All types</option>
+            @foreach (var t in Enum.GetValues<FleetOps.Models.VehicleType>())
+            {
+                <option value="@t" selected="@(type == t)">@t</option>
+            }
+        </select>
+        <button type="submit" class="ghost">Filter</button>
+        <a class="ghost" asp-action="Index">Reset</a>
+    </form>
+
+    <section class="panel-card">
+        @if (Model.Count == 0)
+        {
+            <div class="empty">No vehicles found. <a asp-action="Create">Add the first one</a>.</div>
+        }
+        else
+        {
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Registration</th>
+                            <th>Vehicle</th>
+                            <th>Type</th>
+                            <th>Fuel</th>
+                            <th>Odometer</th>
+                            <th>Status</th>
+                            <th style="text-align:right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var v in Model)
+                    {
+                        var chip = v.Status == FleetOps.Models.VehicleStatus.Active ? "on"
+                                 : v.Status == FleetOps.Models.VehicleStatus.InMaintenance ? "info" : "off";
+                        <tr>
+                            <td><b>@v.RegistrationNumber</b><small>@v.Year</small></td>
+                            <td>@v.Make @v.Model</td>
+                            <td>@v.VehicleType</td>
+                            <td>@v.FuelType</td>
+                            <td>@v.OdometerKm.ToString("N0") km</td>
+                            <td><span class="chip @chip">@v.Status</span></td>
+                            <td style="text-align:right;white-space:nowrap">
+                                <a class="ghost" asp-action="Details" asp-route-id="@v.Id">View</a>
+                                <a class="ghost" asp-action="Edit" asp-route-id="@v.Id">Edit</a>
+                                @if (User.IsInRole("Administrator"))
+                                {
+                                    <a class="ghost danger" asp-action="Delete" asp-route-id="@v.Id">Delete</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+</div>

@@ -1,0 +1,84 @@
+@model FleetOps.Models.Vehicle
+@{
+    ViewData["Title"] = "Add vehicle";
+}
+<div class="wrap">
+    <div class="page-head">
+        <div>
+            <h1>Add vehicle</h1>
+            <p class="lead">Register a new vehicle in the fleet.</p>
+        </div>
+        <a class="ghost" asp-action="Index">← Back</a>
+    </div>
+
+    <form asp-action="Create" method="post" class="panel-card form-grid">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="alert show" style="display:@(ViewData.ModelState.IsValid ? "none" : "flex")"></div>
+
+        <div class="field">
+            <input asp-for="RegistrationNumber" placeholder=" " />
+            <label asp-for="RegistrationNumber"></label>
+            <span asp-validation-for="RegistrationNumber" class="msg err"></span>
+        </div>
+        <div class="field">
+            <input asp-for="Make" placeholder=" " />
+            <label asp-for="Make"></label>
+            <span asp-validation-for="Make" class="msg err"></span>
+        </div>
+        <div class="field">
+            <input asp-for="Model" placeholder=" " />
+            <label asp-for="Model"></label>
+            <span asp-validation-for="Model" class="msg err"></span>
+        </div>
+        <div class="field">
+            <input asp-for="Year" type="number" placeholder=" " />
+            <label asp-for="Year"></label>
+            <span asp-validation-for="Year" class="msg err"></span>
+        </div>
+        <div class="field">
+            <select asp-for="VehicleType" asp-items="Html.GetEnumSelectList<FleetOps.Models.VehicleType>()"></select>
+            <label asp-for="VehicleType"></label>
+        </div>
+        <div class="field">
+            <select asp-for="FuelType" asp-items="Html.GetEnumSelectList<FleetOps.Models.FuelType>()"></select>
+            <label asp-for="FuelType"></label>
+        </div>
+        <div class="field">
+            <input asp-for="CapacityKg" type="number" step="0.01" placeholder=" " />
+            <label asp-for="CapacityKg"></label>
+        </div>
+        <div class="field">
+            <input asp-for="OdometerKm" type="number" step="0.01" placeholder=" " />
+            <label asp-for="OdometerKm"></label>
+        </div>
+        <div class="field">
+            <select asp-for="Status" asp-items="Html.GetEnumSelectList<FleetOps.Models.VehicleStatus>()"></select>
+            <label asp-for="Status"></label>
+        </div>
+        <div class="field">
+            <input asp-for="InsuranceExpiry" type="date" placeholder=" " />
+            <label asp-for="InsuranceExpiry"></label>
+        </div>
+        <div class="field">
+            <input asp-for="FitnessExpiry" type="date" placeholder=" " />
+            <label asp-for="FitnessExpiry"></label>
+        </div>
+        <div class="field">
+            <input asp-for="PurchaseDate" type="date" placeholder=" " />
+            <label asp-for="PurchaseDate"></label>
+        </div>
+        <div class="field field-wide">
+            <textarea asp-for="Notes" rows="3" placeholder=" "></textarea>
+            <label asp-for="Notes"></label>
+        </div>
+
+        <div class="form-actions field-wide">
+            <button type="submit" class="btn">Save vehicle</button>
+            <a class="ghost" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
